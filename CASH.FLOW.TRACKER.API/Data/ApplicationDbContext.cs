@@ -34,6 +34,7 @@ namespace BUGET.TRACKER.API.Data
 
             modelBuilder.Entity<Model.Transaction>()
                 .HasIndex(t => t.CategoryId);
+
         }
 
     }
