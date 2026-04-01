@@ -15,8 +15,12 @@ namespace BUGET.TRACKER.API.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Category>()
-                .HasKey(c => c.CategoryId);
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.HasKey(c => c.CategoryId);
+                entity.Property(c => c.CategoryId).ValueGeneratedOnAdd();
+            });
+              
 
             modelBuilder.Entity<Model.Transaction>()
                 .HasKey(t => t.TransactionId);
@@ -34,8 +38,77 @@ namespace BUGET.TRACKER.API.Data
 
             modelBuilder.Entity<Model.Transaction>()
                 .HasIndex(t => t.CategoryId);
-
         }
 
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            CreatedAt();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        public void CreatedAt()
+        {
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Added);
+
+            var userForNow = Guid.NewGuid();
+            DateTime now = DateTime.UtcNow;
+
+            foreach (var entry in entries)
+            {
+                if (entry.Entity is Model.Transaction transaction)
+                {
+                    transaction.UserId = userForNow;
+                    transaction.CreatedAt = now;
+                } 
+                else if (entry.Entity is Category category)
+                {
+                    category.CreatedAt = now;
+                }
+            }
+        }
+
+
+        public void UpdatedAt()
+        {
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Modified);
+
+            DateTime now = DateTime.UtcNow;
+
+            foreach (var entry in entries)
+            {
+                if (entry.Entity is Model.Transaction transaction)
+                {
+                    transaction.UpdatedAt = now;
+                }
+                else if (entry.Entity is Category category)
+                {
+                    category.UpdatedAt = now;
+                }
+            }
+        }
+
+        public void DeletedAt()
+        {
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Deleted);
+
+            DateTime now = DateTime.UtcNow;
+
+            foreach (var entry in entries)
+            {
+                if (entry.Entity is Model.Transaction transaction)
+                {
+                    entry.State = EntityState.Modified;
+                    transaction.DeletedAt = now;
+                }
+                else if (entry.Entity is Category category)
+                {
+                    entry.State = EntityState.Modified;
+                    category.DeletedAt = now;
+                }
+            }
+        }
     }
 }

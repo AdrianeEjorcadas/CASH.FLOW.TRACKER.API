@@ -1,6 +1,8 @@
 using BUGET.TRACKER.API.Data;
 using CASH.FLOW.TRACKER.API.Repositories;
 using CASH.FLOW.TRACKER.API.Repositories.Interface;
+using CASH.FLOW.TRACKER.API.Services;
+using CASH.FLOW.TRACKER.API.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 //repo
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+//service
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 var app = builder.Build();
 
