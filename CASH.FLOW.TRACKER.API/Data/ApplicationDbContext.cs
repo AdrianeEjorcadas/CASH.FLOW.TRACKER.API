@@ -38,11 +38,17 @@ namespace BUGET.TRACKER.API.Data
 
             modelBuilder.Entity<Model.Transaction>()
                 .HasIndex(t => t.CategoryId);
+
+            //filters
+            modelBuilder.Entity<Category>()
+                .HasQueryFilter(c => !c.DeletedAt.HasValue);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             CreatedAt();
+            UpdatedAt();
+            DeletedAt();
             return base.SaveChangesAsync(cancellationToken);
         }
 

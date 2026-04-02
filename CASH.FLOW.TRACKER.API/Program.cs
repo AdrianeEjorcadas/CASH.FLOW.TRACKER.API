@@ -1,4 +1,5 @@
 using BUGET.TRACKER.API.Data;
+using CASH.FLOW.TRACKER.API.Middleware.Exceptions;
 using CASH.FLOW.TRACKER.API.Repositories;
 using CASH.FLOW.TRACKER.API.Repositories.Interface;
 using CASH.FLOW.TRACKER.API.Services;
@@ -12,6 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+//exception
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -33,6 +38,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseExceptionHandler();
 
 app.UseAuthorization();
 

@@ -1,4 +1,4 @@
-﻿namespace CASH.FLOW.TRACKER.API.Model.DTO
+﻿namespace CASH.FLOW.TRACKER.API.Model.DTO.Categories
 {
     public class AddCategoryDTO
     {
