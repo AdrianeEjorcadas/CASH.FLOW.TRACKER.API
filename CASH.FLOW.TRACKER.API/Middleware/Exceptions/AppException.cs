@@ -29,7 +29,7 @@ namespace CASH.FLOW.TRACKER.API.Middleware.Exceptions
     public sealed class CategoryException : AppException
     {
         public CategoryException(string category)
-            : base($"Category '{category}' was not registered.", HttpStatusCode.NotFound) { }
+            : base($"Category '{category}' was not registered.", HttpStatusCode.BadRequest) { }
     }
     public sealed class CategoryNotFoundException : AppException
     {
@@ -43,5 +43,24 @@ namespace CASH.FLOW.TRACKER.API.Middleware.Exceptions
         public NoCategoryExistingException()
             : base($"No registered category", HttpStatusCode.NotFound) { }
     }
+
+    //TRANSACTION EXCEPTIONS
+    public sealed class TransactionException : AppException
+    {
+        public TransactionException(string transaction)
+            : base($"Transaction '{transaction}' was not registered.", HttpStatusCode.BadRequest) { }
+    }
+
+    public sealed class TransactionNotFoundException : AppException
+    {
+        public TransactionNotFoundException()
+            : base("No transaction found", HttpStatusCode.NotFound) { }
+    }
+    public sealed class NoTransactionExistingException : AppException
+    {
+        public NoTransactionExistingException()
+            : base($"No registered transaction", HttpStatusCode.NotFound) { }
+    }
+
 
 }

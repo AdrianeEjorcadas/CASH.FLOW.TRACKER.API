@@ -42,6 +42,9 @@ namespace BUGET.TRACKER.API.Data
             //filters
             modelBuilder.Entity<Category>()
                 .HasQueryFilter(c => !c.DeletedAt.HasValue);
+
+            modelBuilder.Entity<Model.Transaction>()
+                .HasQueryFilter(t => !t.DeletedAt.HasValue);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -64,7 +67,8 @@ namespace BUGET.TRACKER.API.Data
             {
                 if (entry.Entity is Model.Transaction transaction)
                 {
-                    transaction.UserId = userForNow;
+                    transaction.TransactionId = Guid.NewGuid();
+                    //transaction.UserId = userForNow;
                     transaction.CreatedAt = now;
                 } 
                 else if (entry.Entity is Category category)
