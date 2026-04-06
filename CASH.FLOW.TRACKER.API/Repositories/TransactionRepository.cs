@@ -1,0 +1,111 @@
+﻿using BUGET.TRACKER.API.Data;
+using BUGET.TRACKER.API.Model;
+using CASH.FLOW.TRACKER.API.Model.DTO.Transactions;
+using CASH.FLOW.TRACKER.API.Repositories.Interface;
+using Microsoft.EntityFrameworkCore;
+using System.Collections;
+
+namespace CASH.FLOW.TRACKER.API.Repositories
+{
+    public class TransactionRepository : ITransactionRepository
+    {
+
+        private readonly ApplicationDbContext _context;
+
+        public TransactionRepository(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<Transaction> AddTransactionAsync(Transaction transaction, CancellationToken ct)
+        {
+            var payload = await _context.Transactions
+                .AddAsync(transaction, ct);
+
+            await _context.SaveChangesAsync();
+
+            return transaction;
+        }
+
+        public async Task<IEnumerable<GetTransactionDTO>> GetTransactionsAsync(Guid userId, CancellationToken ct)
+        {
+            var payload = await _context.Transactions
+                .AsNoTracking()
+                .Where(t => t.UserId == userId)
+                .Include(t => t.Category)
+                .Select(t => new GetTransactionDTO
+                {
+                    TransactionId  = t.TransactionId,   
+                    TransactionName = t.TransactionName,
+                    Amount = t.Amount,
+                    CategoryId = t.CategoryId,
+                    CategoryName = t.Category.CategoryName,
+                    Note = t.Note,
+                    TransactionDate = t.TransactionDate,
+                })
+                .ToListAsync(ct);
+
+            return payload;
+        }
+
+        public async Task<GetTransactionDTO?> GetTransactionByIdAsync(Guid transactionId, CancellationToken ct)
+        {
+            var payload = await _context.Transactions
+                .Where(t => t.TransactionId == transactionId)
+                .Select(t => new GetTransactionDTO
+                {
+                    TransactionId = t.TransactionId,
+                    TransactionName = t.TransactionName,
+                    Amount = t.Amount,
+                    CategoryId = t.CategoryId,
+                    CategoryName = t.Category.CategoryName,
+                    Note = t.Note,
+                    TransactionDate = t.TransactionDate,
+                })
+                .FirstOrDefaultAsync(ct);
+
+            return payload;
+        }
+
+        public async Task<bool> DeleteTransactionAsync(Guid transactionId, CancellationToken ct)
+        {
+            var transaction = await _context.Transactions
+                .FindAsync(new object?[] {transactionId}, ct);
+
+            if (transaction is null)
+                return false;
+
+            _context.Transactions.Remove(transaction);
+            await _context.SaveChangesAsync(ct);
+
+            return true;
+        }
+
+        public async Task<GetTransactionDTO?> UpdateTransactionAsync(UpdateTransactionDTO updateTransactionDTO, CancellationToken ct)
+        {
+            var transaction = await _context.Transactions
+                .FindAsync(new object?[] { updateTransactionDTO.TransactionId }, ct);
+
+            if( transaction is null) 
+                return null;
+
+            transaction.TransactionName = updateTransactionDTO.TransactionName;
+            transaction.Amount = updateTransactionDTO.Amount;
+            transaction.TransactionDate = updateTransactionDTO.TransactionDate;
+            transaction.Note = updateTransactionDTO.Note;   
+            transaction.CategoryId = updateTransactionDTO.CategoryId;
+
+            await _context.SaveChangesAsync(ct);
+
+            return (new GetTransactionDTO
+            {
+                TransactionId = transaction.TransactionId,
+                TransactionName = transaction.TransactionName,
+                Amount = transaction.Amount,
+                TransactionDate = transaction.TransactionDate,
+                Note = transaction.Note,
+                CategoryId = transaction.CategoryId,
+            });
+        }
+    }
+}
