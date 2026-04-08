@@ -1,5 +1,7 @@
 ﻿using BUGET.TRACKER.API.Data;
 using BUGET.TRACKER.API.Model;
+using CASH.FLOW.TRACKER.API.Helpers.Pagination;
+using CASH.FLOW.TRACKER.API.Helpers.Pagination.Parameters;
 using CASH.FLOW.TRACKER.API.Middleware.Exceptions;
 using CASH.FLOW.TRACKER.API.Model.DTO;
 using CASH.FLOW.TRACKER.API.Model.DTO.Categories;
@@ -88,6 +90,36 @@ namespace CASH.FLOW.TRACKER.API.Repositories
             await _context.SaveChangesAsync(ct);
 
             return true;
+        }
+
+        public async Task<PagedList<GetCategoryDTO>> GetCategoriesAsync(CategoryParameters categoryParameters, CancellationToken ct)
+        {
+            var query = _context.Categories.AsQueryable();
+            var count = 0;
+
+            //SEARCH TERM
+            if (!string.IsNullOrEmpty(categoryParameters.SearchTerm))
+            {
+                query = query.Where(q => q.CategoryName.Contains(categoryParameters.SearchTerm));
+            }
+
+            count = await query.CountAsync();
+
+            var result = await query
+                .AsNoTracking()
+                .OrderBy(q => q.CategoryName)
+                .Skip((categoryParameters.PageNumber -1) * categoryParameters.PageSize)
+                .Take(categoryParameters.PageSize)
+                .Select(q => new GetCategoryDTO
+                {
+                    CategoryId = q.CategoryId,
+                    CategoryName = q.CategoryName,
+                    CategoryType = q.CategoryType,
+                })
+                .ToListAsync(ct);
+
+            return PagedList<GetCategoryDTO>
+                .ToPagedList(result, count, categoryParameters.PageNumber, categoryParameters.PageSize);
         }
     }
 }

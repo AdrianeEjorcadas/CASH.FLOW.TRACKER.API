@@ -1,8 +1,10 @@
-﻿using CASH.FLOW.TRACKER.API.Model.DTO.Categories;
+﻿using CASH.FLOW.TRACKER.API.Helpers.Pagination.Parameters;
+using CASH.FLOW.TRACKER.API.Model.DTO.Categories;
 using CASH.FLOW.TRACKER.API.Model.Response;
 using CASH.FLOW.TRACKER.API.Services.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace CASH.FLOW.TRACKER.API.Controllers
 {
@@ -81,6 +83,25 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                 StatusCode = 200,
                 Message = "Updated successfully",
                 Data = null
+            });
+        }
+
+        [HttpGet("get-categories")]
+        public async Task<ActionResult<ReturnResponse<GetCategoriesPagedDTO>>> CategoriesAsync([FromQuery]CategoryParameters categoryParameters, CancellationToken ct = default)
+        {
+            var result = await _categoryService.GetCategoriesAsync(categoryParameters, ct);
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(result.metadata));
+
+            return Ok(new ReturnResponse<GetCategoriesPagedDTO>
+            {
+                StatusCode = 200,
+                Message = "Successfully retrieve categories",
+                Data = new GetCategoriesPagedDTO
+                {
+                    Categories = result.category,
+                    Metadata = result.metadata
+                }
             });
         }
 
