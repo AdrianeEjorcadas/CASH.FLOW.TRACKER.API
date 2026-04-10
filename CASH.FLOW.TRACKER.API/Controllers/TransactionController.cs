@@ -1,8 +1,10 @@
-﻿using CASH.FLOW.TRACKER.API.Model.DTO.Transactions;
+﻿using CASH.FLOW.TRACKER.API.Helpers.Pagination.Parameters;
+using CASH.FLOW.TRACKER.API.Model.DTO.Transactions;
 using CASH.FLOW.TRACKER.API.Model.Response;
 using CASH.FLOW.TRACKER.API.Services.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace CASH.FLOW.TRACKER.API.Controllers
 {
@@ -85,6 +87,25 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                 StatusCode = 200,
                 Message = "Updated Successfully",
                 Data = payload
+            });
+        }
+
+        [HttpGet("get-transactions")]
+        public async Task<ActionResult<ReturnResponse<GetTransactionPagedDTO>>> GetTransactionsPagedAsync([FromQuery]TransactionParameters transactionParameters, CancellationToken ct = default)
+        {
+            var result = await _transactionService.GetTransactionsPagedAsync(transactionParameters, ct);
+
+            Response.Headers["X-Transactions-Pagination"] = JsonSerializer.Serialize(result.metadata);
+
+            return Ok(new ReturnResponse<GetTransactionPagedDTO>
+            {
+                StatusCode = 200,
+                Message = "Successfully retrieve transactions",
+                Data = new GetTransactionPagedDTO
+                {
+                    Transactions = result.transactions,
+                    Metadata = result.metadata
+                }
             });
         }
     }

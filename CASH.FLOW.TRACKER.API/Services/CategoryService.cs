@@ -1,4 +1,6 @@
 ﻿using BUGET.TRACKER.API.Model;
+using CASH.FLOW.TRACKER.API.Helpers.Pagination;
+using CASH.FLOW.TRACKER.API.Helpers.Pagination.Parameters;
 using CASH.FLOW.TRACKER.API.Middleware.Exceptions;
 using CASH.FLOW.TRACKER.API.Model.DTO.Categories;
 using CASH.FLOW.TRACKER.API.Repositories.Interface;
@@ -66,6 +68,13 @@ namespace CASH.FLOW.TRACKER.API.Services
 
             if (!isExisting)
                 throw new CategoryNotFoundException(updateCategoryDTO.CategoryId);
+        }
+
+        public async Task<(IEnumerable<GetCategoryDTO> category, Metadata metadata)> GetCategoriesAsync(CategoryParameters categoryParameters, CancellationToken ct)
+        {
+            var result = await _categoryRepo.GetCategoriesAsync(categoryParameters, ct);
+
+            return (category: result, metadata: result.Metadata);
         }
 
     }
