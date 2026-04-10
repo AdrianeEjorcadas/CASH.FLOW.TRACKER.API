@@ -1,5 +1,7 @@
 ﻿using BUGET.TRACKER.API.Data;
 using BUGET.TRACKER.API.Model;
+using CASH.FLOW.TRACKER.API.Helpers.Pagination;
+using CASH.FLOW.TRACKER.API.Helpers.Pagination.Parameters;
 using CASH.FLOW.TRACKER.API.Model.DTO.Transactions;
 using CASH.FLOW.TRACKER.API.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -106,6 +108,40 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                 Note = transaction.Note,
                 CategoryId = transaction.CategoryId,
             });
+        }
+
+        public async Task<PagedList<GetTransactionDTO>> GetTransactionsPagedAsync(TransactionParameters transactionParameters, CancellationToken ct)
+        {
+            var query = _context.Transactions.AsQueryable();
+            var count = 0;
+
+            //SEARCH TERM
+            if (!string.IsNullOrEmpty(transactionParameters.SearchTerm))
+            {
+                query = query.Where(q => q.TransactionName.Contains(transactionParameters.SearchTerm));
+            }
+
+            count = await query.CountAsync(ct);
+
+            var result = await query
+                .AsNoTracking()
+                .OrderBy(q => q.TransactionDate)
+                .Skip((transactionParameters.PageNumber - 1) * transactionParameters.PageSize)
+                .Take(transactionParameters.PageSize)
+                .Select(q => new GetTransactionDTO
+                {
+                    TransactionId = q.TransactionId,
+                    TransactionName = q.TransactionName,
+                    Amount = q.Amount,
+                    TransactionDate = q.TransactionDate,
+                    Note = q.Note,
+                    CategoryId = q.CategoryId,
+                    CategoryName = q.Category.CategoryName
+                })
+                .ToListAsync(ct);
+
+            return PagedList<GetTransactionDTO>
+                .ToPagedList(result, count, transactionParameters.PageNumber, transactionParameters.PageSize);
         }
     }
 }

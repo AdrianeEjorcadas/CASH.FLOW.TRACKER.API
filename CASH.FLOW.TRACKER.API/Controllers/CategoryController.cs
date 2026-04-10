@@ -91,7 +91,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         {
             var result = await _categoryService.GetCategoriesAsync(categoryParameters, ct);
 
-            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(result.metadata));
+            Response.Headers["X-Categories-Pagination"] = JsonSerializer.Serialize(result.metadata);
 
             return Ok(new ReturnResponse<GetCategoriesPagedDTO>
             {

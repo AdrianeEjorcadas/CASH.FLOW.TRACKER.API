@@ -1,4 +1,6 @@
 ﻿using BUGET.TRACKER.API.Model;
+using CASH.FLOW.TRACKER.API.Helpers.Pagination;
+using CASH.FLOW.TRACKER.API.Helpers.Pagination.Parameters;
 using CASH.FLOW.TRACKER.API.Middleware.Exceptions;
 using CASH.FLOW.TRACKER.API.Model.DTO.Transactions;
 using CASH.FLOW.TRACKER.API.Repositories.Interface;
@@ -72,6 +74,13 @@ namespace CASH.FLOW.TRACKER.API.Services
                 throw new TransactionNotFoundException();
 
             return transaction;
+        }
+
+        public async Task<(IEnumerable<GetTransactionDTO> transactions, Metadata metadata)> GetTransactionsPagedAsync(TransactionParameters transactionParameters, CancellationToken ct)
+        {
+            var result = await _transactionRepository.GetTransactionsPagedAsync(transactionParameters, ct);
+
+            return (transactions: result, metadata: result.Metadata);
         }
     }
 }

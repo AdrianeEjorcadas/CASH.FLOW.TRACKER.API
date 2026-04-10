@@ -8,6 +8,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//cors var
+var MyAllowSpecificOrigins = "_AllowAngularApp";
+var ProdSpecificOrigin = "_AllowProdApp";
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -21,6 +25,22 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+//cors-policy
+builder.Services.AddCors(options =>
+{
+    //Production set up
+    options.AddPolicy(name: ProdSpecificOrigin,
+        policy => policy.WithOrigins("https://sample.com")
+              .WithMethods("GET", "POST", "PATCH", "DELETE")// restrict to supported methods
+              .WithHeaders("Content-Type", "Authorization")); // restrict to needed headers
+
+    //Development: allow local host testing
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy => policy.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
 });
 
 //repo
@@ -42,6 +62,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseExceptionHandler();
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 
