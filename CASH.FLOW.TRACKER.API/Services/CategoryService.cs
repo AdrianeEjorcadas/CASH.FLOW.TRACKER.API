@@ -24,6 +24,7 @@ namespace CASH.FLOW.TRACKER.API.Services
             {
                 CategoryName = categoryDTO.CategoryName,
                 CategoryType = categoryDTO.CategoryType,
+                UserId = categoryDTO.UserId,
             };
 
             var payload = await _categoryRepo.AddCategoryAsync(category, ct);
@@ -34,19 +35,19 @@ namespace CASH.FLOW.TRACKER.API.Services
             return true;
         }
 
-        public async Task<GetCategoryDTO> GetCategoryByIdAsync(int categoryId, CancellationToken ct)
+        public async Task<GetCategoryDTO> GetCategoryByIdAsync(GetCategoryByIdDTO categoryByIdDTO, CancellationToken ct)
         {
-            var payload = await _categoryRepo.GetCategoryByIdAsync(categoryId, ct);
+            var payload = await _categoryRepo.GetCategoryByIdAsync(categoryByIdDTO, ct);
 
             if (payload is null)
-                throw new CategoryNotFoundException(categoryId);
+                throw new CategoryNotFoundException(categoryByIdDTO.CategoryId);
 
             return payload;
         }
 
-        public async Task<IEnumerable<GetCategoryDTO>> GetCategories(CancellationToken ct)
+        public async Task<IEnumerable<GetCategoryDTO>> GetCategories(Guid userId, CancellationToken ct)
         {
-            var payload = await _categoryRepo.GetCategories(ct);
+            var payload = await _categoryRepo.GetCategories(userId, ct);
 
             if (!payload.Any())
                 throw new NoCategoryExistingException();

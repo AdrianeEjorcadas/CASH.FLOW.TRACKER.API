@@ -8,9 +8,9 @@ namespace CASH.FLOW.TRACKER.API.Services.Interface
     {
         Task<bool> AddCategoryAsync(AddCategoryDTO categoryDTO, CancellationToken ct);
         Task DeleteCategoryAsync(DeleteCategoryDTO deleteCategoryDTO, CancellationToken ct);
-        Task<IEnumerable<GetCategoryDTO>> GetCategories(CancellationToken ct);
+        Task<IEnumerable<GetCategoryDTO>> GetCategories(Guid userId, CancellationToken ct);
         Task<(IEnumerable<GetCategoryDTO> category, Metadata metadata)> GetCategoriesAsync(CategoryParameters categoryParameters, CancellationToken ct);
-        Task<GetCategoryDTO> GetCategoryByIdAsync(int categoryId, CancellationToken ct);
+        Task<GetCategoryDTO> GetCategoryByIdAsync(GetCategoryByIdDTO categoryByIdDTO, CancellationToken ct);
         Task UpdateCategoryAsync(UpdateCategoryDTO updateCategoryDTO, CancellationToken ct);
     }
 }

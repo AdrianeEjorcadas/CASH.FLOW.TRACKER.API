@@ -21,7 +21,8 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         }
 
         [HttpPost("category")]
-        public async Task<ActionResult<ReturnResponse<object>>> AddCategoryAsync([FromBody] AddCategoryDTO addCategoryDT, CancellationToken ct = default)
+        public async Task<ActionResult<ReturnResponse<object>>> AddCategoryAsync([FromBody] AddCategoryDTO addCategoryDT, 
+            CancellationToken ct = default)
         {
             await _categoryService.AddCategoryAsync(addCategoryDT, ct);
 
@@ -35,9 +36,9 @@ namespace CASH.FLOW.TRACKER.API.Controllers
 
 
         [HttpGet("category-by-id")]
-        public async Task<ActionResult<ReturnResponse<GetCategoryDTO>>> GetCategoryByIdAsync([FromQuery] int categoryId, CancellationToken ct = default)
+        public async Task<ActionResult<ReturnResponse<GetCategoryDTO>>> GetCategoryByIdAsync([FromQuery] GetCategoryByIdDTO categoryByIdDTO, CancellationToken ct = default)
         {
-            var payload = await _categoryService.GetCategoryByIdAsync(categoryId, ct);
+            var payload = await _categoryService.GetCategoryByIdAsync(categoryByIdDTO, ct);
 
             return Ok(new ReturnResponse<GetCategoryDTO>
             {
@@ -48,9 +49,9 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         }
 
         [HttpGet("categories")]
-        public async Task<ActionResult<ReturnResponse<IEnumerable<GetCategoryDTO>>>> GetCategoriesAsync(CancellationToken ct = default)
+        public async Task<ActionResult<ReturnResponse<IEnumerable<GetCategoryDTO>>>> GetCategoriesAsync([FromQuery] Guid userId ,CancellationToken ct = default)
         {
-            var payload = await _categoryService.GetCategories(ct);
+            var payload = await _categoryService.GetCategories(userId, ct);
 
             return Ok(new ReturnResponse<IEnumerable<GetCategoryDTO>>
             {
@@ -87,7 +88,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         }
 
         [HttpGet("get-categories")]
-        public async Task<ActionResult<ReturnResponse<GetCategoriesPagedDTO>>> CategoriesAsync([FromQuery]CategoryParameters categoryParameters, CancellationToken ct = default)
+        public async Task<ActionResult<ReturnResponse<GetCategoriesPagedDTO>>> CategoriesAsync([FromQuery] CategoryParameters categoryParameters, CancellationToken ct = default)
         {
             var result = await _categoryService.GetCategoriesAsync(categoryParameters, ct);
 

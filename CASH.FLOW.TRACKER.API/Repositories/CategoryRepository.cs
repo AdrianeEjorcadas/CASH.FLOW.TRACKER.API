@@ -29,25 +29,27 @@ namespace CASH.FLOW.TRACKER.API.Repositories
             return payload.Entity;
         }
 
-        public async Task<GetCategoryDTO?> GetCategoryByIdAsync(int categoryId, CancellationToken ct)
+        public async Task<GetCategoryDTO?> GetCategoryByIdAsync(GetCategoryByIdDTO categoryByIdDTO, CancellationToken ct)
         {
             var payload = await _context.Categories
                 .AsNoTracking()
+                .Where(c => c.CategoryId == categoryByIdDTO.CategoryId && c.UserId == categoryByIdDTO.UserId)
                 .Select(c => new GetCategoryDTO
                 {
                     CategoryId = c.CategoryId,
                     CategoryName = c.CategoryName,
                     CategoryType = c.CategoryType,
                 })
-                .FirstOrDefaultAsync(c => c.CategoryId == categoryId);
+                .FirstOrDefaultAsync(ct);
 
             return payload;
         }
 
-        public async Task<IEnumerable<GetCategoryDTO>> GetCategories(CancellationToken ct)
+        public async Task<IEnumerable<GetCategoryDTO>> GetCategories(Guid userId, CancellationToken ct)
         {
             var payload = await _context.Categories
                 .AsNoTracking()
+                .Where(c => c.UserId == userId)
                 .Select(c => new GetCategoryDTO
                 {
                     CategoryId = c.CategoryId,
@@ -77,7 +79,8 @@ namespace CASH.FLOW.TRACKER.API.Repositories
         public async Task<bool> UpdateCategoryAsync(UpdateCategoryDTO updateCategoryDTO, CancellationToken ct)
         {
             var category = await _context.Categories
-                .FindAsync(new object?[] { updateCategoryDTO.CategoryId }, ct);
+                .Where(c => c.CategoryId == updateCategoryDTO.CategoryId && c.UserId  == updateCategoryDTO.UserId)
+                .FirstOrDefaultAsync(ct);
 
             if (category is null)
                 return false;

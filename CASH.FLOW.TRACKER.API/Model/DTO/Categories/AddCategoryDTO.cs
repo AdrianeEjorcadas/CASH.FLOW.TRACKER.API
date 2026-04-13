@@ -4,6 +4,6 @@
     {
         public string CategoryName { get; set; }
         public string CategoryType { get; set; }
-        public Guid? UserId { get; set; }
+        public Guid UserId { get; set; }
     }
 }
