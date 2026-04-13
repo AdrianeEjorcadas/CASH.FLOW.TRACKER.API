@@ -54,12 +54,12 @@ namespace CASH.FLOW.TRACKER.API.Services
             return payload;
         }
 
-        public async Task DeleteCategoryAsync(int categoryId, CancellationToken ct)
+        public async Task DeleteCategoryAsync(DeleteCategoryDTO deleteCategoryDTO, CancellationToken ct)
         {
-            var isExisting = await _categoryRepo.DeleteCategoryAsync(categoryId, ct);
+            var isExisting = await _categoryRepo.DeleteCategoryAsync(deleteCategoryDTO, ct);
 
             if (!isExisting)
-                throw new CategoryNotFoundException(categoryId);
+                throw new CategoryNotFoundException(deleteCategoryDTO.CategoryId);
         }
 
         public async Task UpdateCategoryAsync(UpdateCategoryDTO updateCategoryDTO, CancellationToken ct)
@@ -73,6 +73,9 @@ namespace CASH.FLOW.TRACKER.API.Services
         public async Task<(IEnumerable<GetCategoryDTO> category, Metadata metadata)> GetCategoriesAsync(CategoryParameters categoryParameters, CancellationToken ct)
         {
             var result = await _categoryRepo.GetCategoriesAsync(categoryParameters, ct);
+
+            if (result.Metadata.TotalCount <= 0)
+                throw new NoCategoryExistingException();
 
             return (category: result, metadata: result.Metadata);
         }

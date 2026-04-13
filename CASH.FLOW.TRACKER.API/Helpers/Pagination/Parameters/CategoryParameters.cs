@@ -2,5 +2,6 @@
 {
     public class CategoryParameters : RequestParameters
     {
+        public Guid UserId { get; set; }
     }
 }

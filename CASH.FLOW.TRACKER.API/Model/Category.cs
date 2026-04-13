@@ -3,6 +3,7 @@
     public class Category
     {
         public int CategoryId { get; set; }
+        public Guid UserId { get; set; }
         public string CategoryName { get; set; } //Food, Rent, Salary
         public string CategoryType { get; set; } //Income or Expense
         public DateTimeOffset CreatedAt { get; set; }

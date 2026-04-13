@@ -59,10 +59,11 @@ namespace CASH.FLOW.TRACKER.API.Repositories
             return payload;
         }
 
-        public async Task<bool> DeleteCategoryAsync(int categoryId, CancellationToken ct)
+        public async Task<bool> DeleteCategoryAsync(DeleteCategoryDTO deleteCategoryDTO, CancellationToken ct)
         {
             var payload = await _context.Categories
-                .FindAsync(new object?[] { categoryId }, ct);
+                .Where(c => c.UserId == deleteCategoryDTO.UserId && c.CategoryId == deleteCategoryDTO.CategoryId)
+                .FirstOrDefaultAsync(ct);
 
             if(payload is null)
                 return false;
@@ -94,7 +95,7 @@ namespace CASH.FLOW.TRACKER.API.Repositories
 
         public async Task<PagedList<GetCategoryDTO>> GetCategoriesAsync(CategoryParameters categoryParameters, CancellationToken ct)
         {
-            var query = _context.Categories.AsQueryable();
+            var query = _context.Categories.Where(q => q.UserId == categoryParameters.UserId).AsQueryable();
             var count = 0;
 
             //SEARCH TERM

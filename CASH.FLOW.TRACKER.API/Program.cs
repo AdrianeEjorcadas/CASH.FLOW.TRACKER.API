@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 //cors var
-var MyAllowSpecificOrigins = "_AllowAngularApp";
-var ProdSpecificOrigin = "_AllowProdApp";
+var DevCorsPolicy = "DevPolicy";
+var ProdSpecificOrigin = "ProdPolicy";
 
 // Add services to the container.
 
@@ -37,7 +37,7 @@ builder.Services.AddCors(options =>
               .WithHeaders("Content-Type", "Authorization")); // restrict to needed headers
 
     //Development: allow local host testing
-    options.AddPolicy(name: MyAllowSpecificOrigins,
+    options.AddPolicy(name: DevCorsPolicy,
         policy => policy.WithOrigins("http://localhost:4200")
                         .AllowAnyHeader()
                         .AllowAnyMethod());
@@ -63,7 +63,7 @@ app.UseHttpsRedirection();
 
 app.UseExceptionHandler();
 
-app.UseCors(MyAllowSpecificOrigins);
+app.UseCors(DevCorsPolicy);
 
 app.UseAuthorization();
 

@@ -5,5 +5,6 @@
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } //Food, Rent, Salary
         public string CategoryType { get; set; } //Income or Expense
+        public Guid UserId { get; set; }
     }
 }

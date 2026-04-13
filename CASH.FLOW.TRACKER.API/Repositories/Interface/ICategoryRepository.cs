@@ -8,7 +8,7 @@ namespace CASH.FLOW.TRACKER.API.Repositories.Interface
     public interface ICategoryRepository
     {
         Task<Category> AddCategoryAsync(Category category, CancellationToken ct);
-        Task<bool> DeleteCategoryAsync(int categoryId, CancellationToken ct);
+        Task<bool> DeleteCategoryAsync(DeleteCategoryDTO deleteCategoryDTO, CancellationToken ct);
         Task<IEnumerable<GetCategoryDTO>> GetCategories(CancellationToken ct);
         Task<PagedList<GetCategoryDTO>> GetCategoriesAsync(CategoryParameters categoryParameters, CancellationToken ct);
         Task<GetCategoryDTO?> GetCategoryByIdAsync(int categoryId, CancellationToken ct);

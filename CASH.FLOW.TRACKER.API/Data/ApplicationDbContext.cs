@@ -20,7 +20,9 @@ namespace BUGET.TRACKER.API.Data
                 entity.HasKey(c => c.CategoryId);
                 entity.Property(c => c.CategoryId).ValueGeneratedOnAdd();
             });
-              
+
+            modelBuilder.Entity<Category>()
+                .HasIndex(c => c.UserId);
 
             modelBuilder.Entity<Model.Transaction>()
                 .HasKey(t => t.TransactionId);

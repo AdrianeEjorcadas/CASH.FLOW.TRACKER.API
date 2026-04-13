@@ -61,9 +61,9 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         }
 
         [HttpDelete("category")]
-        public async Task<ActionResult<ReturnResponse<object>>> DeleteCategoryAsync([FromQuery] int categoryId, CancellationToken ct = default)
+        public async Task<ActionResult<ReturnResponse<object>>> DeleteCategoryAsync([FromQuery] DeleteCategoryDTO deleteCategoryDTO, CancellationToken ct = default)
         {
-            await _categoryService.DeleteCategoryAsync(categoryId, ct);
+            await _categoryService.DeleteCategoryAsync(deleteCategoryDTO, ct);
 
             return Ok(new ReturnResponse<object>
             {
