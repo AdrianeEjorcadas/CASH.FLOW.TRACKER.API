@@ -2,5 +2,6 @@
 {
     public class TransactionParameters : RequestParameters
     {
+        public Guid UserId { get; set; }
     }
 }

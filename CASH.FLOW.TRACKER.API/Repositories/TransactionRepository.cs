@@ -44,16 +44,17 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                     CategoryName = t.Category.CategoryName,
                     Note = t.Note,
                     TransactionDate = t.TransactionDate,
+                    UserId = t.UserId
                 })
                 .ToListAsync(ct);
 
             return payload;
         }
 
-        public async Task<GetTransactionDTO?> GetTransactionByIdAsync(Guid transactionId, CancellationToken ct)
+        public async Task<GetTransactionDTO?> GetTransactionByIdAsync(GetTransactionByIdDTO transactionByIdDTO, CancellationToken ct)
         {
             var payload = await _context.Transactions
-                .Where(t => t.TransactionId == transactionId)
+                .Where(t => t.TransactionId == transactionByIdDTO.TransactionID && t.UserId == transactionByIdDTO.UserId)
                 .Select(t => new GetTransactionDTO
                 {
                     TransactionId = t.TransactionId,
@@ -63,16 +64,18 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                     CategoryName = t.Category.CategoryName,
                     Note = t.Note,
                     TransactionDate = t.TransactionDate,
+                    UserId = t.UserId
                 })
                 .FirstOrDefaultAsync(ct);
 
             return payload;
         }
 
-        public async Task<bool> DeleteTransactionAsync(Guid transactionId, CancellationToken ct)
+        public async Task<bool> DeleteTransactionAsync(DeleteTransactionDTO deleteTransactionDTO, CancellationToken ct)
         {
             var transaction = await _context.Transactions
-                .FindAsync(new object?[] {transactionId}, ct);
+                .Where(t => t.TransactionId == deleteTransactionDTO.TransactionId && t.UserId == deleteTransactionDTO.UserId)
+                .FirstOrDefaultAsync(ct);
 
             if (transaction is null)
                 return false;
@@ -86,7 +89,8 @@ namespace CASH.FLOW.TRACKER.API.Repositories
         public async Task<GetTransactionDTO?> UpdateTransactionAsync(UpdateTransactionDTO updateTransactionDTO, CancellationToken ct)
         {
             var transaction = await _context.Transactions
-                .FindAsync(new object?[] { updateTransactionDTO.TransactionId }, ct);
+                .Where(t => t.TransactionId == updateTransactionDTO.TransactionId && t.UserId == updateTransactionDTO.UserId)
+                .FirstOrDefaultAsync(ct);
 
             if( transaction is null) 
                 return null;
@@ -107,12 +111,16 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                 TransactionDate = transaction.TransactionDate,
                 Note = transaction.Note,
                 CategoryId = transaction.CategoryId,
+                UserId = transaction.UserId,
             });
         }
 
         public async Task<PagedList<GetTransactionDTO>> GetTransactionsPagedAsync(TransactionParameters transactionParameters, CancellationToken ct)
         {
-            var query = _context.Transactions.AsQueryable();
+            var query = _context.Transactions
+                .Where(t => t.UserId == transactionParameters.UserId)
+                .AsQueryable();
+
             var count = 0;
 
             //SEARCH TERM
@@ -136,7 +144,8 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                     TransactionDate = q.TransactionDate,
                     Note = q.Note,
                     CategoryId = q.CategoryId,
-                    CategoryName = q.Category.CategoryName
+                    CategoryName = q.Category.CategoryName,
+                    UserId = q.UserId,
                 })
                 .ToListAsync(ct);
 

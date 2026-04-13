@@ -7,8 +7,8 @@ namespace CASH.FLOW.TRACKER.API.Services.Interface
     public interface ITransactionService
     {
         Task<bool> AddTransactionAsync(AddTransactionDTO addTransactionDTO, CancellationToken ct);
-        Task DeleteTransactionAsync(Guid transactionId, CancellationToken ct);
-        Task<GetTransactionDTO?> GetTransactionByIdAsync(Guid transactionId, CancellationToken ct);
+        Task DeleteTransactionAsync(DeleteTransactionDTO deleteTransactionDTO, CancellationToken ct);
+        Task<GetTransactionDTO?> GetTransactionByIdAsync(GetTransactionByIdDTO transactionByIdDTO, CancellationToken ct);
         Task<IEnumerable<GetTransactionDTO>> GetTransactionsAsync(Guid userId, CancellationToken ct);
         Task<(IEnumerable<GetTransactionDTO> transactions, Metadata metadata)> GetTransactionsPagedAsync(TransactionParameters transactionParameters, CancellationToken ct);
         Task<GetTransactionDTO> UpdateTransactionAsync(UpdateTransactionDTO updateTransactionDTO, CancellationToken ct);

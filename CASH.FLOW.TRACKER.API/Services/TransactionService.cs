@@ -48,9 +48,9 @@ namespace CASH.FLOW.TRACKER.API.Services
             return paylaoad;
         }
 
-        public async Task<GetTransactionDTO?> GetTransactionByIdAsync(Guid transactionId, CancellationToken ct)
+        public async Task<GetTransactionDTO?> GetTransactionByIdAsync(GetTransactionByIdDTO transactionByIdDTO, CancellationToken ct)
         {
-            var payload = await _transactionRepository.GetTransactionByIdAsync(transactionId, ct);
+            var payload = await _transactionRepository.GetTransactionByIdAsync(transactionByIdDTO, ct);
 
             if (payload is null)
                 throw new TransactionNotFoundException();
@@ -58,9 +58,9 @@ namespace CASH.FLOW.TRACKER.API.Services
             return payload;
         }
 
-        public async Task DeleteTransactionAsync(Guid transactionId, CancellationToken ct)
+        public async Task DeleteTransactionAsync(DeleteTransactionDTO deleteTransactionDTO, CancellationToken ct)
         {
-            var isDeleted = await _transactionRepository.DeleteTransactionAsync(transactionId, ct);
+            var isDeleted = await _transactionRepository.DeleteTransactionAsync(deleteTransactionDTO, ct);
 
             if (!isDeleted)
                 throw new NoTransactionExistingException();
@@ -79,6 +79,9 @@ namespace CASH.FLOW.TRACKER.API.Services
         public async Task<(IEnumerable<GetTransactionDTO> transactions, Metadata metadata)> GetTransactionsPagedAsync(TransactionParameters transactionParameters, CancellationToken ct)
         {
             var result = await _transactionRepository.GetTransactionsPagedAsync(transactionParameters, ct);
+
+            if (result.Metadata.TotalCount <= 0)
+                throw new NoTransactionExistingException();
 
             return (transactions: result, metadata: result.Metadata);
         }

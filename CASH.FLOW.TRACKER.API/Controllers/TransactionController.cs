@@ -49,10 +49,10 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         }
 
         [HttpGet("transaction-by-id")]
-        public async Task<ActionResult<ReturnResponse<GetTransactionDTO>>> GetTransactionByIdAsync([FromQuery]Guid transactionId, 
+        public async Task<ActionResult<ReturnResponse<GetTransactionDTO>>> GetTransactionByIdAsync([FromQuery]GetTransactionByIdDTO transactionByIdDTO, 
             CancellationToken ct = default)
         {
-            var payload = await _transactionService.GetTransactionByIdAsync(transactionId, ct);
+            var payload = await _transactionService.GetTransactionByIdAsync(transactionByIdDTO, ct);
 
             return Ok(new ReturnResponse<GetTransactionDTO>
             {
@@ -63,10 +63,10 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         }
 
         [HttpDelete("delete-transaction")]
-        public async Task<ActionResult<ReturnResponse<object>>> DeleteTransactionAsync([FromQuery] Guid transactionId,
+        public async Task<ActionResult<ReturnResponse<object>>> DeleteTransactionAsync([FromQuery] DeleteTransactionDTO deleteTransactionDTO,
             CancellationToken ct = default)
         {
-            await _transactionService.DeleteTransactionAsync(transactionId, ct);
+            await _transactionService.DeleteTransactionAsync(deleteTransactionDTO, ct);
 
             return Ok(new ReturnResponse<object>
             {
