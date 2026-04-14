@@ -119,6 +119,7 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                     CategoryId = q.CategoryId,
                     CategoryName = q.CategoryName,
                     CategoryType = q.CategoryType,
+                    UserId = q.UserId
                 })
                 .ToListAsync(ct);
 
