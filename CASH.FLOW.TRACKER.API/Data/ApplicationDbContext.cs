@@ -1,10 +1,13 @@
 ﻿using BUGET.TRACKER.API.Model;
+using CASH.FLOW.TRACKER.API.Model;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
 
 namespace BUGET.TRACKER.API.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityUserContext<ApplicationUser, Guid>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
