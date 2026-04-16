@@ -1,4 +1,6 @@
-﻿namespace BUGET.TRACKER.API.Model
+﻿using CASH.FLOW.TRACKER.API.Model;
+
+namespace BUGET.TRACKER.API.Model
 {
     public class Transaction
     {
@@ -15,5 +17,6 @@
 
         // Navigation property: one transaction belongs to one category
         public Category Category { get; set; }
+        public ApplicationUser User { get; set; }
     }
 }

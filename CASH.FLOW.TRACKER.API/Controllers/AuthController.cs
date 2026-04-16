@@ -31,7 +31,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
 
 
         [HttpPost("register")]
-        public async Task<ActionResult<ReturnResponse<object>>> Register(RegisterDto dto)
+        public async Task<ActionResult<ReturnResponse<string>>> Register(RegisterDto dto)
         {
             var user = new ApplicationUser
             {
@@ -44,11 +44,11 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
             {
-                return BadRequest(new ReturnResponse<object>
+                return BadRequest(new ReturnResponse<string>
                 {
                     StatusCode = 200,
                     Message = "Registration Failed. Please try again",
-                    Data = result.Errors
+                    Data = string.Empty
                 });
             }
 
@@ -68,24 +68,24 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                 "Confirm Your Email - Action Required",
                 body);
 
-            return Ok(new ReturnResponse<object> {
+            return Ok(new ReturnResponse<string> {
                 StatusCode = 200,
                 Message = "Registration successful. Please confirm your email.",
-                Data = null
+                Data = string.Empty
             });
         }
 
         [HttpGet("confirm-email")]
-        public async Task<ActionResult<ReturnResponse<object>>> ConfirmEmail(string userId, string token)
+        public async Task<ActionResult<ReturnResponse<string>>> ConfirmEmail(string userId, string token)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user is null)
             {
-                return NotFound(new ReturnResponse<object>
+                return NotFound(new ReturnResponse<string>
                 {
                     StatusCode = 404,
                     Message = "",
-                    Data = null
+                    Data = string.Empty
                 });
             }
 
@@ -93,17 +93,17 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
 
             return result.Succeeded
-                ? Ok(new ReturnResponse<object>
+                ? Ok(new ReturnResponse<string>
                 {
                     StatusCode = 200,
                     Message = "Email confirmed.",
-                    Data = null
+                    Data = string.Empty
                 })
-                : BadRequest(new ReturnResponse<object>
+                : BadRequest(new ReturnResponse<string>
                 {
                     StatusCode = 400,
                     Message = "Invalid or expired token.",
-                    Data = null
+                    Data = string.Empty
                 });
         }
 
@@ -117,7 +117,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                 {
                     StatusCode = 401,
                     Message = "Invalid credentials",
-                    Data = null
+                    Data = string.Empty
                 });
             }
 
@@ -127,7 +127,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                 {
                     StatusCode = 401,
                     Message = "Please confirm your email first",
-                    Data = null
+                    Data = string.Empty
                 });
             }
 
@@ -137,7 +137,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                 {
                     StatusCode = 401,
                     Message = "Invalid credentials",
-                    Data = null
+                    Data = string.Empty
                 });
             }
 
@@ -163,7 +163,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                 {
                     StatusCode = 200,
                     Message = safeResponse,
-                    Data = null
+                    Data = string.Empty
                 });
             }
 
@@ -180,21 +180,21 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             {
                 StatusCode = 200,
                 Message = safeResponse,
-                Data = null
+                Data = string.Empty
             });
         }
 
         [HttpPost("reset-password")]
-        public async Task<ActionResult<ReturnResponse<object>>> ResetPassword(ResetPasswordDto dto)
+        public async Task<ActionResult<ReturnResponse<string>>> ResetPassword(ResetPasswordDto dto)
         {
             var user = await _userManager.FindByIdAsync(dto.UserId);
             if (user is null)
             {
-                return BadRequest(new ReturnResponse<object>
+                return BadRequest(new ReturnResponse<string>
                 {
                     StatusCode = 400,
                     Message = "Invalid request",
-                    Data = null
+                    Data = string.Empty
                 });
             }
 
@@ -202,49 +202,49 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             var result = await _userManager.ResetPasswordAsync(user, decodedUrl, dto.NewPassword);
             
             return result.Succeeded
-                ? Ok(new ReturnResponse<object>
+                ? Ok(new ReturnResponse<string>
                 {
                     StatusCode = 200,
                     Message = "Password reset succesful",
-                    Data = null
+                    Data = string.Empty
                 })
-                : BadRequest(new ReturnResponse<object>
+                : BadRequest(new ReturnResponse<string>
                 {
                     StatusCode = 400,
                     Message = $"{result.Errors}",
-                    Data = null
+                    Data = string.Empty
                 });
         }
 
         [HttpPost("change-password")]
-        public async Task<ActionResult<ReturnResponse<object>>> ChangePassword(ChangePasswordDto dto)
+        public async Task<ActionResult<ReturnResponse<string>>> ChangePassword(ChangePasswordDto dto)
         {
             var user = await _userManager.FindByIdAsync(dto.User.Id.ToString());
 
             if (user is null)
             {
-                return Unauthorized(new ReturnResponse<object>
+                return Unauthorized(new ReturnResponse<string>
                 {
                     StatusCode = 401,
                     Message = "Invalid request",
-                    Data = null
+                    Data = string.Empty
                 });
             }
 
             var result = await _userManager.ChangePasswordAsync(dto.User, dto.CurrentPassword, dto.NewPassword);
 
             return result.Succeeded
-                ? Ok(new ReturnResponse<object>
+                ? Ok(new ReturnResponse<string>
                 {
                     StatusCode = 200,
                     Message = "Password change succesful",
-                    Data = null
+                    Data = string.Empty
                 })
-                : BadRequest(new ReturnResponse<object>
+                : BadRequest(new ReturnResponse<string>
                 {
                     StatusCode = 400,
-                    Message = $"{result.Errors}",
-                    Data = null
+                    Message = string.Join(", ", result.Errors.Select(e => e.Description)),
+                    Data = string.Empty
                 });
         }
 

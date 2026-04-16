@@ -28,6 +28,9 @@ namespace BUGET.TRACKER.API.Data
                 .HasIndex(c => c.UserId);
 
             modelBuilder.Entity<Model.Transaction>()
+                .HasIndex(t => new { t.CategoryId, t.UserId });
+
+            modelBuilder.Entity<Model.Transaction>()
                 .HasKey(t => t.TransactionId);
 
             modelBuilder.Entity<Model.Transaction>()
@@ -37,12 +40,15 @@ namespace BUGET.TRACKER.API.Data
                 .IsRequired();
 
             modelBuilder.Entity<Model.Transaction>()
-                .Property(t => t.Amount)
-                .HasColumnType("decimal(18,2)")
+                .HasOne(t => t.User)
+                .WithMany(t => t.Transactions)
+                .HasForeignKey(t => t.UserId)
                 .IsRequired();
 
             modelBuilder.Entity<Model.Transaction>()
-                .HasIndex(t => t.CategoryId);
+                .Property(t => t.Amount)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
 
             //filters
             modelBuilder.Entity<Category>()
