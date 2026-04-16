@@ -1,12 +1,27 @@
 using BUGET.TRACKER.API.Data;
 using CASH.FLOW.TRACKER.API.Middleware.Exceptions;
+using CASH.FLOW.TRACKER.API.Model;
 using CASH.FLOW.TRACKER.API.Repositories;
 using CASH.FLOW.TRACKER.API.Repositories.Interface;
 using CASH.FLOW.TRACKER.API.Services;
 using CASH.FLOW.TRACKER.API.Services.Interface;
+using DotNetEnv;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add Identity
+var jwtSection = builder.Configuration.GetSection("JWT");
+var jwtIssuer = jwtSection["ISSUER"] ?? throw new InvalidOperationException("Missing JWT:ISSUER");
+var jwtAudience = jwtSection["AUDIENCE"] ?? throw new InvalidOperationException("Missing JWT:AUDIENCE");
+var jwtSecret = jwtSection["SECRET"] ?? throw new InvalidOperationException("Missing JWT:SECRET");
 
 //cors var
 var DevCorsPolicy = "DevPolicy";
@@ -22,10 +37,45 @@ builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
+
+//database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+//identity - no roles
+builder.Services.AddIdentityCore<ApplicationUser>(options =>
+{
+    options.SignIn.RequireConfirmedEmail = true;
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+//JWT Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+    };
+});
+
+builder.Services.AddAuthorization();
 
 //cors-policy
 builder.Services.AddCors(options =>
@@ -50,6 +100,8 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 //service
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<JwtTokenService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
@@ -64,6 +116,8 @@ app.UseHttpsRedirection();
 app.UseExceptionHandler();
 
 app.UseCors(DevCorsPolicy);
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
