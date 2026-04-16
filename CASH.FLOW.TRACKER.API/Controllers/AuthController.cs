@@ -31,7 +31,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
 
 
         [HttpPost("register")]
-        public async Task<ActionResult<ReturnResponse<string>>> Register(RegisterDto dto)
+        public async Task<ActionResult<ReturnResponse<string>>> Register([FromBody]RegisterDto dto)
         {
             var user = new ApplicationUser
             {
@@ -76,9 +76,9 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         }
 
         [HttpGet("confirm-email")]
-        public async Task<ActionResult<ReturnResponse<string>>> ConfirmEmail(string userId, string token)
+        public async Task<ActionResult<ReturnResponse<string>>> ConfirmEmail([FromQuery] ConfirmEmailDto dto)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(dto.userId);
             if (user is null)
             {
                 return NotFound(new ReturnResponse<string>
@@ -89,7 +89,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                 });
             }
 
-            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
+            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(dto.token));
             var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
 
             return result.Succeeded
@@ -108,7 +108,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<ReturnResponse<string>>> Login(LoginDto dto)
+        public async Task<ActionResult<ReturnResponse<string>>> Login([FromBody]LoginDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user is null)
@@ -152,7 +152,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         }
 
         [HttpPost("forgot-password")]
-        public async Task<ActionResult<ReturnResponse<string>>> ForgotPassword(ForgotPasswordDto dto)
+        public async Task<ActionResult<ReturnResponse<string>>> ForgotPassword([FromBody]ForgotPasswordDto dto)
         {
             const string safeResponse = "If that email is registered you will receive a reset link.";
 
@@ -172,7 +172,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             var resetUrl = $"https://frontend.com/reset-password" + //change link
                            $"?userId={user.Id}&token={encodedToken}";
             var subject = "Reset Your Password – Action Required";
-            var body = $"Click the link to reset your password: <a href='{resetUrl}'>{resetUrl}</a>";
+            var body = $"Click the link to reset your password: <a href='{resetUrl}'>Reset password</a>";
 
             await _emailService.SendAsync(user.Email!, subject, body);
 
@@ -185,7 +185,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         }
 
         [HttpPost("reset-password")]
-        public async Task<ActionResult<ReturnResponse<string>>> ResetPassword(ResetPasswordDto dto)
+        public async Task<ActionResult<ReturnResponse<string>>> ResetPassword([FromBody] ResetPasswordDto dto)
         {
             var user = await _userManager.FindByIdAsync(dto.UserId);
             if (user is null)
@@ -217,9 +217,9 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         }
 
         [HttpPost("change-password")]
-        public async Task<ActionResult<ReturnResponse<string>>> ChangePassword(ChangePasswordDto dto)
+        public async Task<ActionResult<ReturnResponse<string>>> ChangePassword([FromBody]ChangePasswordDto dto)
         {
-            var user = await _userManager.FindByIdAsync(dto.User.Id.ToString());
+            var user = await _userManager.FindByIdAsync(dto.UserId.ToString());
 
             if (user is null)
             {
@@ -231,7 +231,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                 });
             }
 
-            var result = await _userManager.ChangePasswordAsync(dto.User, dto.CurrentPassword, dto.NewPassword);
+            var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
 
             return result.Succeeded
                 ? Ok(new ReturnResponse<string>

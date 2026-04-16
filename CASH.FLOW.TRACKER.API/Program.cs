@@ -18,9 +18,10 @@ Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Identity
-var jwtIssuer = builder.Configuration["JWT_ISSUER"]!;
-var jwtAudience = builder.Configuration["JWT_AUDIENCE"]!;
-var jwtSecret = builder.Configuration["JWT_SECRET"]!;
+var jwtSection = builder.Configuration.GetSection("JWT");
+var jwtIssuer = jwtSection["ISSUER"] ?? throw new InvalidOperationException("Missing JWT:ISSUER");
+var jwtAudience = jwtSection["AUDIENCE"] ?? throw new InvalidOperationException("Missing JWT:AUDIENCE");
+var jwtSecret = jwtSection["SECRET"] ?? throw new InvalidOperationException("Missing JWT:SECRET");
 
 //cors var
 var DevCorsPolicy = "DevPolicy";

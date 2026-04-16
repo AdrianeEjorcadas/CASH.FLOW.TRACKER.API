@@ -18,9 +18,9 @@ namespace CASH.FLOW.TRACKER.API.Services
         public string GenerateToken(ApplicationUser user)
         {
             var jwt = _config.GetSection("JWT");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["JWT_SECRET"]!));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["SECRET"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.UtcNow.AddMinutes(int.Parse(jwt["JWT_TIMEOUT"]!));
+            var expires = DateTime.UtcNow.AddMinutes(int.Parse(jwt["TIMEOUT"]!));
 
             var claims = new[]
             {
@@ -31,8 +31,8 @@ namespace CASH.FLOW.TRACKER.API.Services
             };
 
             var token = new JwtSecurityToken(
-                issuer: jwt["JWT_ISSUER"],
-                audience: jwt["JWT_AUDIENCE"],
+                issuer: jwt["ISSUER"],
+                audience: jwt["AUDIENCE"],
                 claims: claims,
                 expires: expires,
                 signingCredentials: creds
