@@ -2,6 +2,7 @@
 using CASH.FLOW.TRACKER.API.Model.DTO.Transactions;
 using CASH.FLOW.TRACKER.API.Model.Response;
 using CASH.FLOW.TRACKER.API.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -19,7 +20,8 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             _transactionService = transactionService;
         }
 
-        
+
+        [Authorize]
         [HttpPost("transaction")]
         public async Task<ActionResult<ReturnResponse<object>>> AddTransactionAsync([FromBody] AddTransactionDTO addTransactionDTO, 
             CancellationToken ct = default) 
@@ -34,6 +36,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             });
         }
 
+        [Authorize]
         [HttpGet("transactions")]
         public async Task<ActionResult<ReturnResponse<IEnumerable<GetTransactionDTO>>>> GetTransactionsAsync([FromQuery] Guid userId,
             CancellationToken ct = default)
@@ -48,6 +51,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             });
         }
 
+        [Authorize]
         [HttpGet("transaction-by-id")]
         public async Task<ActionResult<ReturnResponse<GetTransactionDTO>>> GetTransactionByIdAsync([FromQuery]GetTransactionByIdDTO transactionByIdDTO, 
             CancellationToken ct = default)
@@ -62,6 +66,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             });
         }
 
+        [Authorize]
         [HttpDelete("delete-transaction")]
         public async Task<ActionResult<ReturnResponse<object>>> DeleteTransactionAsync([FromQuery] DeleteTransactionDTO deleteTransactionDTO,
             CancellationToken ct = default)
@@ -76,6 +81,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             });
         }
 
+        [Authorize]
         [HttpPatch("update-transaction")]
         public async Task<ActionResult<ReturnResponse<GetTransactionDTO>>> UpdateTransactionAsync([FromBody] UpdateTransactionDTO updateTransactionDTO, 
             CancellationToken ct = default)
@@ -90,6 +96,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             });
         }
 
+        [Authorize]
         [HttpGet("get-transactions")]
         public async Task<ActionResult<ReturnResponse<GetTransactionPagedDTO>>> GetTransactionsPagedAsync([FromQuery]TransactionParameters transactionParameters, CancellationToken ct = default)
         {

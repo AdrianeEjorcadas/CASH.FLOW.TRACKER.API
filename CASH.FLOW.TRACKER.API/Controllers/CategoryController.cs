@@ -2,6 +2,7 @@
 using CASH.FLOW.TRACKER.API.Model.DTO.Categories;
 using CASH.FLOW.TRACKER.API.Model.Response;
 using CASH.FLOW.TRACKER.API.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -20,6 +21,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             _categoryService = categoryService;
         }
 
+        [Authorize]
         [HttpPost("category")]
         public async Task<ActionResult<ReturnResponse<object>>> AddCategoryAsync([FromBody] AddCategoryDTO addCategoryDT, 
             CancellationToken ct = default)
@@ -35,6 +37,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         }
 
 
+        [Authorize]
         [HttpGet("category-by-id")]
         public async Task<ActionResult<ReturnResponse<GetCategoryDTO>>> GetCategoryByIdAsync([FromQuery] GetCategoryByIdDTO categoryByIdDTO, CancellationToken ct = default)
         {
@@ -48,6 +51,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             });
         }
 
+        [Authorize]
         [HttpGet("categories")]
         public async Task<ActionResult<ReturnResponse<IEnumerable<GetCategoryDTO>>>> GetCategoriesAsync([FromQuery] Guid userId ,CancellationToken ct = default)
         {
@@ -61,6 +65,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             });
         }
 
+        [Authorize]
         [HttpDelete("category")]
         public async Task<ActionResult<ReturnResponse<object>>> DeleteCategoryAsync([FromQuery] DeleteCategoryDTO deleteCategoryDTO, CancellationToken ct = default)
         {
@@ -74,6 +79,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             });
         }
 
+        [Authorize]
         [HttpPatch("category")]
         public async Task<ActionResult<ReturnResponse<object>>> UpdateCategoryAsync([FromBody] UpdateCategoryDTO updateCategoryDTO, CancellationToken ct = default)
         {
@@ -87,6 +93,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             });
         }
 
+        [Authorize]
         [HttpGet("get-categories")]
         public async Task<ActionResult<ReturnResponse<GetCategoriesPagedDTO>>> CategoriesAsync([FromQuery] CategoryParameters categoryParameters, CancellationToken ct = default)
         {

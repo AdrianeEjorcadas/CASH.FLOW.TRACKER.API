@@ -2,11 +2,14 @@
 using CASH.FLOW.TRACKER.API.Model.Response;
 using CASH.FLOW.TRACKER.API.Services;
 using CASH.FLOW.TRACKER.API.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Tokens.Experimental;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace CASH.FLOW.TRACKER.API.Controllers
@@ -27,6 +30,24 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             _userManager = userManager;
             _jwtService = jwtService;
             _emailService = emailService;
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public ActionResult<ReturnResponse<MeDto>> Me()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var userName = User.FindFirstValue(JwtRegisteredClaimNames.Name);
+
+            var userDetails = new MeDto(userId, email, userName);
+
+            return Ok(new ReturnResponse<MeDto>
+            {
+                StatusCode = 200,
+                Message = "Retrieve user details",
+                Data = userDetails
+            });
         }
 
 
@@ -123,7 +144,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
 
             if (!await _userManager.IsEmailConfirmedAsync(user))
             {
-                return Unauthorized(new ReturnResponse<string>
+                return Ok(new ReturnResponse<string>
                 {
                     StatusCode = 401,
                     Message = "Please confirm your email first",
@@ -143,11 +164,38 @@ namespace CASH.FLOW.TRACKER.API.Controllers
 
             var token = _jwtService.GenerateToken(user);
 
+            // Write JWT into an httpOnly cookie
+            Response.Cookies.Append("jwt", token, new CookieOptions
+            {
+                HttpOnly = true, // JS cannot read this cookie
+                Secure = true,  // only sent over HTTPS
+                SameSite = SameSiteMode.None, // CSRF protection
+                Expires = DateTimeOffset.UtcNow.AddMinutes(60)
+            });
+
             return Ok(new ReturnResponse<string>
             {
                 StatusCode = 200,
                 Message = "Login successfully",
-                Data = token
+                Data = string.Empty
+            });
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public ActionResult<ReturnResponse<string>> Logout()
+        {
+            Response.Cookies.Delete("jwt", new CookieOptions
+            {
+                Path = "/",
+                Secure = true,
+                SameSite = SameSiteMode.None,
+            });
+            return Ok(new ReturnResponse<string>
+            {
+                StatusCode = 200,
+                Message = "Logged out.",
+                Data = string.Empty
             });
         }
 
@@ -216,6 +264,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                 });
         }
 
+        [Authorize]
         [HttpPost("change-password")]
         public async Task<ActionResult<ReturnResponse<string>>> ChangePassword([FromBody]ChangePasswordDto dto)
         {

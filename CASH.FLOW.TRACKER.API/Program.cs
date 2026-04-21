@@ -11,9 +11,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 Env.Load();
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +57,10 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
+// Disable automatic claim type mapping
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
+
 //JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -73,6 +79,16 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
     };
+
+    // Read the token from the cookie instead of the header
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            context.Token = context.Request.Cookies["jwt"];
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddAuthorization();
@@ -84,13 +100,15 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: ProdSpecificOrigin,
         policy => policy.WithOrigins("https://sample.com")
               .WithMethods("GET", "POST", "PATCH", "DELETE")// restrict to supported methods
-              .WithHeaders("Content-Type", "Authorization")); // restrict to needed headers
+              .WithHeaders("Content-Type", "Authorization")
+              .AllowCredentials()); // restrict to needed headers
 
     //Development: allow local host testing
     options.AddPolicy(name: DevCorsPolicy,
         policy => policy.WithOrigins("http://localhost:4200")
                         .AllowAnyHeader()
-                        .AllowAnyMethod());
+                        .AllowAnyMethod()
+                        .AllowCredentials());
 });
 
 //repo
