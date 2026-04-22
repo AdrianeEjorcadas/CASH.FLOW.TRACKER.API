@@ -21,15 +21,18 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly JwtTokenService _jwtService;
         private readonly IEmailService _emailService;
+        private readonly IConfiguration _config;
 
         public AuthController(
             UserManager<ApplicationUser> userManager,
             JwtTokenService jwtService,
-            IEmailService emailService)
+            IEmailService emailService,
+            IConfiguration config)
         {
             _userManager = userManager;
             _jwtService = jwtService;
             _emailService = emailService;
+            _config = config;
         }
 
         [HttpGet("me")]
@@ -65,7 +68,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
             {
-                return BadRequest(new ReturnResponse<string>
+                return Ok(new ReturnResponse<string>
                 {
                     StatusCode = 200,
                     Message = "Registration Failed. Please try again",
@@ -75,7 +78,9 @@ namespace CASH.FLOW.TRACKER.API.Controllers
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-            var confirmUrl = $"{Request.Scheme}://{Request.Host}/api/auth/confirm-email" +
+            //var configSection = _config.GetSection("FRONTEND");
+            var frontendUrl = _config["FRONTEND:DEVURL"];
+            var confirmUrl = $"{frontendUrl}/confirm-email" +
                            $"?userId={user.Id}&token={encodedToken}";
             var body = $"<p>Hi {user.FullName}, <br>" +
                        "<p>Thank you for signing up! Please confirm your email address to activate your account.</p> <br>" +

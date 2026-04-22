@@ -19,6 +19,8 @@ Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+
 // Add Identity
 var jwtSection = builder.Configuration.GetSection("JWT");
 var jwtIssuer = jwtSection["ISSUER"] ?? throw new InvalidOperationException("Missing JWT:ISSUER");
