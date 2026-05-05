@@ -12,7 +12,7 @@ namespace CASH.FLOW.TRACKER.API.Repositories.Interface
         Task<GetTransactionDTO?> GetTransactionByIdAsync(GetTransactionByIdDTO transactionByIdDTO, CancellationToken ct);
         Task<IEnumerable<GetTransactionDTO>> GetTransactionsAsync(Guid userId, CancellationToken ct);
         Task<PagedList<GetTransactionDTO>> GetTransactionsPagedAsync(TransactionParameters transactionParameters, CancellationToken ct);
-        Task<GetTransactionDTO?> UpdateTransactionAsync(UpdateTransactionDTO updateTransactionDTO, CancellationToken ct);
+        Task<bool> UpdateTransactionAsync(UpdateTransactionDTO updateTransactionDTO, CancellationToken ct);
         //Task<(GetTransactionDTO? transaction, bool isSuccess)> UpdateTransactionAsync(UpdateTransactionDTO updateTransactionDTO, CancellationToken ct);
     }
 }

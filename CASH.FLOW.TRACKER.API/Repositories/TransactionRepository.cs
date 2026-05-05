@@ -42,6 +42,7 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                     Amount = t.Amount,
                     CategoryId = t.CategoryId,
                     CategoryName = t.Category.CategoryName,
+                    CategoryType = t.Category.CategoryType,
                     Note = t.Note,
                     TransactionDate = t.TransactionDate,
                     UserId = t.UserId
@@ -62,6 +63,7 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                     Amount = t.Amount,
                     CategoryId = t.CategoryId,
                     CategoryName = t.Category.CategoryName,
+                    CategoryType = t.Category.CategoryType,
                     Note = t.Note,
                     TransactionDate = t.TransactionDate,
                     UserId = t.UserId
@@ -86,14 +88,14 @@ namespace CASH.FLOW.TRACKER.API.Repositories
             return true;
         }
 
-        public async Task<GetTransactionDTO?> UpdateTransactionAsync(UpdateTransactionDTO updateTransactionDTO, CancellationToken ct)
+        public async Task<bool> UpdateTransactionAsync(UpdateTransactionDTO updateTransactionDTO, CancellationToken ct)
         {
             var transaction = await _context.Transactions
                 .Where(t => t.TransactionId == updateTransactionDTO.TransactionId && t.UserId == updateTransactionDTO.UserId)
                 .FirstOrDefaultAsync(ct);
 
             if( transaction is null) 
-                return null;
+                return false;
 
             transaction.TransactionName = updateTransactionDTO.TransactionName;
             transaction.Amount = updateTransactionDTO.Amount;
@@ -103,16 +105,7 @@ namespace CASH.FLOW.TRACKER.API.Repositories
 
             await _context.SaveChangesAsync(ct);
 
-            return (new GetTransactionDTO
-            {
-                TransactionId = transaction.TransactionId,
-                TransactionName = transaction.TransactionName,
-                Amount = transaction.Amount,
-                TransactionDate = transaction.TransactionDate,
-                Note = transaction.Note,
-                CategoryId = transaction.CategoryId,
-                UserId = transaction.UserId,
-            });
+            return true;
         }
 
         public async Task<PagedList<GetTransactionDTO>> GetTransactionsPagedAsync(TransactionParameters transactionParameters, CancellationToken ct)
@@ -133,7 +126,7 @@ namespace CASH.FLOW.TRACKER.API.Repositories
 
             var result = await query
                 .AsNoTracking()
-                .OrderBy(q => q.TransactionDate)
+                .OrderByDescending(q => q.TransactionDate)
                 .Skip((transactionParameters.PageNumber - 1) * transactionParameters.PageSize)
                 .Take(transactionParameters.PageSize)
                 .Select(q => new GetTransactionDTO
@@ -145,6 +138,7 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                     Note = q.Note,
                     CategoryId = q.CategoryId,
                     CategoryName = q.Category.CategoryName,
+                    CategoryType = q.Category.CategoryType,
                     UserId = q.UserId,
                 })
                 .ToListAsync(ct);

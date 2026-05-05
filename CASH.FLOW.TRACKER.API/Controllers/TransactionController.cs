@@ -21,18 +21,18 @@ namespace CASH.FLOW.TRACKER.API.Controllers
         }
 
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("transaction")]
-        public async Task<ActionResult<ReturnResponse<object>>> AddTransactionAsync([FromBody] AddTransactionDTO addTransactionDTO, 
+        public async Task<ActionResult<ReturnResponse<string>>> AddTransactionAsync([FromBody] AddTransactionDTO addTransactionDTO, 
             CancellationToken ct = default) 
         {
             await _transactionService.AddTransactionAsync(addTransactionDTO, ct);
 
-            return Ok(new ReturnResponse<object>
+            return Ok(new ReturnResponse<string>
             {
                 StatusCode = 200,
                 Message = "Successfully added",
-                Data = null
+                Data = string.Empty
             });
         }
 
@@ -68,7 +68,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
 
         [Authorize]
         [HttpDelete("delete-transaction")]
-        public async Task<ActionResult<ReturnResponse<object>>> DeleteTransactionAsync([FromQuery] DeleteTransactionDTO deleteTransactionDTO,
+        public async Task<ActionResult<ReturnResponse<string>>> DeleteTransactionAsync([FromQuery] DeleteTransactionDTO deleteTransactionDTO,
             CancellationToken ct = default)
         {
             await _transactionService.DeleteTransactionAsync(deleteTransactionDTO, ct);
@@ -77,26 +77,26 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             {
                 StatusCode = 200,
                 Message = "Successfully deleted",
-                Data = null
+                Data = string.Empty
             });
         }
 
         [Authorize]
         [HttpPatch("update-transaction")]
-        public async Task<ActionResult<ReturnResponse<GetTransactionDTO>>> UpdateTransactionAsync([FromBody] UpdateTransactionDTO updateTransactionDTO, 
+        public async Task<ActionResult<ReturnResponse<string>>> UpdateTransactionAsync([FromBody] UpdateTransactionDTO updateTransactionDTO, 
             CancellationToken ct = default)
         {
-            var payload = await _transactionService.UpdateTransactionAsync(updateTransactionDTO, ct);
+            await _transactionService.UpdateTransactionAsync(updateTransactionDTO, ct);
 
-            return Ok(new ReturnResponse<GetTransactionDTO>
+            return Ok(new ReturnResponse<string>
             {
                 StatusCode = 200,
                 Message = "Updated Successfully",
-                Data = payload
+                Data = string.Empty
             });
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("get-transactions")]
         public async Task<ActionResult<ReturnResponse<GetTransactionPagedDTO>>> GetTransactionsPagedAsync([FromQuery]TransactionParameters transactionParameters, CancellationToken ct = default)
         {

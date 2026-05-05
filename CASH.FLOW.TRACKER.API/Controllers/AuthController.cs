@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Tokens.Experimental;
+using Sprache;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -221,8 +222,9 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));  
-            var resetUrl = $"https://frontend.com/reset-password" + //change link
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+            var frontendUrl = _config["FRONTEND:DEVURL"];
+            var resetUrl = $"{frontendUrl}/reset-password" + //change link
                            $"?userId={user.Id}&token={encodedToken}";
             var subject = "Reset Your Password – Action Required";
             var body = $"Click the link to reset your password: <a href='{resetUrl}'>Reset password</a>";
@@ -243,7 +245,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             var user = await _userManager.FindByIdAsync(dto.UserId);
             if (user is null)
             {
-                return BadRequest(new ReturnResponse<string>
+                return Ok(new ReturnResponse<string>
                 {
                     StatusCode = 400,
                     Message = "Invalid request",
@@ -261,7 +263,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                     Message = "Password reset succesful",
                     Data = string.Empty
                 })
-                : BadRequest(new ReturnResponse<string>
+                : Ok(new ReturnResponse<string>
                 {
                     StatusCode = 400,
                     Message = $"{result.Errors}",
@@ -277,7 +279,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
 
             if (user is null)
             {
-                return Unauthorized(new ReturnResponse<string>
+                return Ok(new ReturnResponse<string>
                 {
                     StatusCode = 401,
                     Message = "Invalid request",
@@ -294,7 +296,7 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                     Message = "Password change succesful",
                     Data = string.Empty
                 })
-                : BadRequest(new ReturnResponse<string>
+                : Ok(new ReturnResponse<string>
                 {
                     StatusCode = 400,
                     Message = string.Join(", ", result.Errors.Select(e => e.Description)),
@@ -302,6 +304,41 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                 });
         }
 
+        [Authorize]
+        [HttpPatch("update-profile")]
+        public async Task<ActionResult<string>> UpdateProfile([FromBody] UpdateProfileDto dto) 
+        {
+            var user = await _userManager.FindByIdAsync(dto.UserId);
+
+            if(user is null)
+            {
+                return Ok(new ReturnResponse<string>
+                {
+                    StatusCode = 401,
+                    Message = "User not found",
+                    Data = string.Empty
+                });
+            }
+
+            user.FirstName = dto.FirstName;
+            user.LastName = dto.LastName;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            return result.Succeeded
+                ? Ok(new ReturnResponse<string>
+                {
+                    StatusCode = 200,
+                    Message = "Profile change succesfully",
+                    Data = string.Empty
+                })
+                : Ok(new ReturnResponse<string>
+                {
+                    StatusCode = 400,
+                    Message = string.Join(", ", result.Errors.Select(e => e.Description)),
+                    Data = string.Empty
+                });
+        }
     }
 }
 

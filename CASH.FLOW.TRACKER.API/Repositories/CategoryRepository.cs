@@ -39,6 +39,7 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                     CategoryId = c.CategoryId,
                     CategoryName = c.CategoryName,
                     CategoryType = c.CategoryType,
+                    UserId = c.UserId
                 })
                 .FirstOrDefaultAsync(ct);
 
@@ -50,11 +51,13 @@ namespace CASH.FLOW.TRACKER.API.Repositories
             var payload = await _context.Categories
                 .AsNoTracking()
                 .Where(c => c.UserId == userId)
+                .OrderBy(c => c.CategoryName)
                 .Select(c => new GetCategoryDTO
                 {
                     CategoryId = c.CategoryId,
                     CategoryName = c.CategoryName,
                     CategoryType = c.CategoryType,
+                    UserId = userId
                 })
                 .ToListAsync(ct);
 

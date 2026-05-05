@@ -66,14 +66,13 @@ namespace CASH.FLOW.TRACKER.API.Services
                 throw new NoTransactionExistingException();
         }
 
-        public async Task<GetTransactionDTO> UpdateTransactionAsync(UpdateTransactionDTO updateTransactionDTO , CancellationToken ct)
+        public async Task UpdateTransactionAsync(UpdateTransactionDTO updateTransactionDTO , CancellationToken ct)
         {
-            var transaction = await _transactionRepository.UpdateTransactionAsync(updateTransactionDTO, ct);
+            var isUpdated = await _transactionRepository.UpdateTransactionAsync(updateTransactionDTO, ct);
 
-            if (transaction is null)
+            if (!isUpdated)
                 throw new TransactionNotFoundException();
 
-            return transaction;
         }
 
         public async Task<(IEnumerable<GetTransactionDTO> transactions, Metadata metadata)> GetTransactionsPagedAsync(TransactionParameters transactionParameters, CancellationToken ct)

@@ -11,6 +11,6 @@ namespace CASH.FLOW.TRACKER.API.Services.Interface
         Task<GetTransactionDTO?> GetTransactionByIdAsync(GetTransactionByIdDTO transactionByIdDTO, CancellationToken ct);
         Task<IEnumerable<GetTransactionDTO>> GetTransactionsAsync(Guid userId, CancellationToken ct);
         Task<(IEnumerable<GetTransactionDTO> transactions, Metadata metadata)> GetTransactionsPagedAsync(TransactionParameters transactionParameters, CancellationToken ct);
-        Task<GetTransactionDTO> UpdateTransactionAsync(UpdateTransactionDTO updateTransactionDTO, CancellationToken ct);
+        Task UpdateTransactionAsync(UpdateTransactionDTO updateTransactionDTO, CancellationToken ct);
     }
 }
