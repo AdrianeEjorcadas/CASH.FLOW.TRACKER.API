@@ -5,5 +5,6 @@ namespace CASH.FLOW.TRACKER.API.Repositories.Interface
     public interface IDashboardRepository
     {
         Task<IEnumerable<InitialDataDto>> GetInitialData(GetInitialDataDto dto, CancellationToken ct);
+        Task<IEnumerable<MonthlyBreakdownDto>> GetMonthlyBreakdown(Guid userId, CancellationToken ct);
     }
 }

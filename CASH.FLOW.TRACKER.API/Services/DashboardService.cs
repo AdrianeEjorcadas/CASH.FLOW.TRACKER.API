@@ -22,5 +22,15 @@ namespace CASH.FLOW.TRACKER.API.Services
             
             return payload;
         }
+
+        public async Task<IEnumerable<MonthlyBreakdownDto>> GetMonthlyBreakdown(Guid userId, CancellationToken ct)
+        {
+            var payload = await _dashboardRepository.GetMonthlyBreakdown(userId, ct);
+
+            if (!payload.Any())
+                throw new TransactionNotFoundException();
+
+            return payload;
+        }
     }
 }

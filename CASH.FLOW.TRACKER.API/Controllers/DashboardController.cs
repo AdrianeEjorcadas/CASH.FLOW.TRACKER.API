@@ -25,7 +25,20 @@ namespace CASH.FLOW.TRACKER.API.Controllers
             {
                 StatusCode = 200,
                 Data = payload,
-                Message = "Dashboard initial data loaded succesfully"
+                Message = "Dashboard initial data loaded successfully"
+            });
+        }
+
+        [HttpGet("dashboard-monthly-breakdown")]
+        public async Task<ActionResult<ReturnResponse<IEnumerable<MonthlyBreakdownDto>>>> GetMonthlyBreakdown([FromQuery] Guid userId, CancellationToken ct = default)
+        {
+            var payload = await  _dashboardService.GetMonthlyBreakdown(userId, ct);
+
+            return Ok(new ReturnResponse<IEnumerable<MonthlyBreakdownDto>>
+            {
+                StatusCode = 200,
+                Data = payload,
+                Message = "Monthly breakdown data loaded successfully"
             });
         }
     }
