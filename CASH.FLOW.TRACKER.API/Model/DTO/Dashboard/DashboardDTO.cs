@@ -1,0 +1,1 @@
+﻿public record GetInitialDataDto(Guid userId, DateTimeOffset startDate, DateTimeOffset endDate);

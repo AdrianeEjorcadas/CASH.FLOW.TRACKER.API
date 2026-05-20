@@ -33,6 +33,7 @@ namespace CASH.FLOW.TRACKER.API.Repositories
         {
             var payload = await _context.Transactions
                 .AsNoTracking()
+                .OrderByDescending(t => t.TransactionDate)
                 .Where(t => t.UserId == userId)
                 .Include(t => t.Category)
                 .Select(t => new GetTransactionDTO
@@ -47,6 +48,7 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                     TransactionDate = t.TransactionDate,
                     UserId = t.UserId
                 })
+                .Take(5)
                 .ToListAsync(ct);
 
             return payload;
