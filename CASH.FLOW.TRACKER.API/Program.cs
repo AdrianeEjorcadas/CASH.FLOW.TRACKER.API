@@ -21,6 +21,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
 
+
 // Add Identity
 var jwtSection = builder.Configuration.GetSection("JWT");
 var jwtIssuer = jwtSection["ISSUER"] ?? throw new InvalidOperationException("Missing JWT:ISSUER");
@@ -100,7 +101,7 @@ builder.Services.AddCors(options =>
 {
     //Production set up
     options.AddPolicy(name: ProdSpecificOrigin,
-        policy => policy.WithOrigins("https://sample.com")
+        policy => policy.WithOrigins("https://cash-flow-tracker-drab.vercel.app")
               .WithMethods("GET", "POST", "PATCH", "DELETE")// restrict to supported methods
               .WithHeaders("Content-Type", "Authorization")
               .AllowCredentials()); // restrict to needed headers
@@ -131,13 +132,16 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseCors(DevCorsPolicy);
+}
+else
+{
+    app.UseCors(ProdSpecificOrigin);
 }
 
 app.UseHttpsRedirection();
 
 app.UseExceptionHandler();
-
-app.UseCors(DevCorsPolicy);
 
 app.UseAuthentication();
 
