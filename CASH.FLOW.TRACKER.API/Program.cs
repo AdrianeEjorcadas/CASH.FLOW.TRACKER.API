@@ -45,7 +45,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 //database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AzureConnection"));
 });
 
 //identity - no roles
