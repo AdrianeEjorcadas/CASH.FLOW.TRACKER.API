@@ -15,7 +15,7 @@ namespace CASH.FLOW.TRACKER.API.Services
 
         public async Task SendAsync(string to, string subject, string htmlBody)
         {
-            var s = _config.GetSection("EMAIL");
+            var s = _config.GetSection("BREVOEMAIL");
             using var client = new SmtpClient(s["HOST"], int.Parse(s["PORT"]!))
             {
                 Credentials = new NetworkCredential(s["USER"], s["PW"]),
