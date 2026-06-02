@@ -103,7 +103,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: ProdSpecificOrigin,
         policy => policy.WithOrigins("https://cash-flow-tracker-drab.vercel.app")
               .WithMethods("GET", "POST", "PATCH", "DELETE")// restrict to supported methods
-              .WithHeaders("Content-Type", "Authorization")
+              .AllowAnyHeader()
               .AllowCredentials()); // restrict to needed headers
 
     //Development: allow local host testing
