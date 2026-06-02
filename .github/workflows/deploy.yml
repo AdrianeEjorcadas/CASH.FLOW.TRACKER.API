@@ -1,9 +1,9 @@
-﻿name: Deploy .NET 9 Web API to Azure
+name: Deploy .NET 9 Web API to Azure
 
 on:
   push:
     branches:
-      - master   # or 'master' if that's your default branch
+      - master   # triggers on master branch
 
 jobs:
   build-and-deploy:
@@ -19,18 +19,18 @@ jobs:
         dotnet-version: '9.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore CASH.FLOW.TRACKER.API/CASH.FLOW.TRACKER.API.csproj
 
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build CASH.FLOW.TRACKER.API/CASH.FLOW.TRACKER.API.csproj --configuration Release --no-restore
 
     - name: Publish
-      run: dotnet publish -c Release -o ./publish
+      run: dotnet publish CASH.FLOW.TRACKER.API/CASH.FLOW.TRACKER.API.csproj -c Release -o ./publish
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: cashflowtracker-e0gaarcqfwb7fhg9.southeastasia-01.azurewebsites.net          # replace with your App Service name
+        app-name: cashflowtracker          # must match your App Service name
         slot-name: Production
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
         package: ./publish
