@@ -47,7 +47,7 @@ namespace BUGET.TRACKER.API.Data
 
             modelBuilder.Entity<Model.Transaction>()
                 .Property(t => t.Amount)
-                .HasColumnType("decimal(18,2)")
+                .HasColumnType("numeric(18,2)")
                 .IsRequired();
 
             //filters
