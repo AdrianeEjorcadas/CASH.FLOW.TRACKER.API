@@ -339,6 +339,21 @@ namespace CASH.FLOW.TRACKER.API.Controllers
                     Data = string.Empty
                 });
         }
+
+        [HttpGet("env-check")]
+        public IActionResult EnvCheck([FromServices] IConfiguration config)
+        {
+            var s = config.GetSection("BREVOEMAIL");
+            return Ok(new
+            {
+                Host = s["HOST"],
+                Port = s["PORT"],
+                User = s["USER"],
+                From = s["FROM"],
+                PwSet = string.IsNullOrEmpty(s["PW"]) ? "Missing" : "Present"
+            });
+        }
+
     }
 }
 
