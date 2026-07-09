@@ -105,7 +105,7 @@ builder.Services.AddCors(options =>
                 "https://cash-flow-tracker-drab.vercel.app",
                 "https://cashflow.adrianeejorcadas.com"
               )
-              .WithMethods("GET", "POST", "PATCH", "DELETE")// restrict to supported methods
+              .AllowAnyMethod()
               .AllowAnyHeader() //allow header
               .AllowCredentials()); // restrict to needed headers
 
@@ -143,11 +143,8 @@ else
 }
 
 app.UseHttpsRedirection();
-
 app.UseExceptionHandler();
-
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();
