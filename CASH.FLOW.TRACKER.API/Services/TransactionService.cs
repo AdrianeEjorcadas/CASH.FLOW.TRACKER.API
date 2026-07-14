@@ -27,12 +27,15 @@ namespace CASH.FLOW.TRACKER.API.Services
                 CategoryId = addTransactionDTO.CategoryId,
                 Amount = addTransactionDTO.Amount,
                 Note = addTransactionDTO.Note,
-                TransactionDate = addTransactionDTO.TransactionDate
+                //TransactionDate = addTransactionDTO.TransactionDate
+                // Take only the calendar date the client intended, drop time-of-day/offset entirely.
+                // This guarantees .Year/.Month reads back identical to what was written.
+                TransactionDate = new DateTimeOffset(addTransactionDTO.TransactionDate.Date, TimeSpan.Zero),
             };
 
             var result = await _transactionRepository.AddTransactionAsync(transaction, ct);
 
-            if(result is null)
+            if (result is null)
                 throw new TransactionException(addTransactionDTO.TransactionName);
 
             return true;
