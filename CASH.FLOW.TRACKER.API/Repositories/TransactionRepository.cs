@@ -6,6 +6,7 @@ using CASH.FLOW.TRACKER.API.Model.DTO.Transactions;
 using CASH.FLOW.TRACKER.API.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 using System.Collections;
+using System.Linq;
 
 namespace CASH.FLOW.TRACKER.API.Repositories
 {
@@ -45,7 +46,8 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                     CategoryName = t.Category.CategoryName,
                     CategoryType = t.Category.CategoryType,
                     Note = t.Note,
-                    TransactionDate = t.TransactionDate,
+                    //TransactionDate = t.TransactionDate,
+                    TransactionDate = t.TransactionDate.ToOffset(TimeSpan.FromHours(8)),
                     UserId = t.UserId
                 })
                 .Take(5)
@@ -67,7 +69,8 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                     CategoryName = t.Category.CategoryName,
                     CategoryType = t.Category.CategoryType,
                     Note = t.Note,
-                    TransactionDate = t.TransactionDate,
+                    //TransactionDate = t.TransactionDate,
+                    TransactionDate = t.TransactionDate.ToOffset(TimeSpan.FromHours(8)),
                     UserId = t.UserId
                 })
                 .FirstOrDefaultAsync(ct);
@@ -101,7 +104,9 @@ namespace CASH.FLOW.TRACKER.API.Repositories
 
             transaction.TransactionName = updateTransactionDTO.TransactionName;
             transaction.Amount = updateTransactionDTO.Amount;
-            transaction.TransactionDate = updateTransactionDTO.TransactionDate;
+            //transaction.TransactionDate = updateTransactionDTO.TransactionDate;
+            //normalize the date to cater Posgresql
+            transaction.TransactionDate = updateTransactionDTO.TransactionDate.ToUniversalTime();
             transaction.Note = updateTransactionDTO.Note;   
             transaction.CategoryId = updateTransactionDTO.CategoryId;
 
@@ -136,7 +141,8 @@ namespace CASH.FLOW.TRACKER.API.Repositories
                     TransactionId = q.TransactionId,
                     TransactionName = q.TransactionName,
                     Amount = q.Amount,
-                    TransactionDate = q.TransactionDate,
+                    //TransactionDate = q.TransactionDate,
+                    TransactionDate = q.TransactionDate.ToOffset(TimeSpan.FromHours(8)),
                     Note = q.Note,
                     CategoryId = q.CategoryId,
                     CategoryName = q.Category.CategoryName,
